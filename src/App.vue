@@ -14,7 +14,9 @@ export default {
       template: '',
       peserta: '[{ "name": "No ", "phone": "Data" }]',
       undian: [],
-      renderComponent: true
+      num: 0,
+      renderComponent: true,
+      pemenang: []
     }
   },
   watch: {
@@ -32,6 +34,10 @@ export default {
     }
   },
   methods: {
+    pindahHalaman(val) {
+      window.clearInterval()
+      this.template = val
+    },
     updatePeserta(val) {
       this.peserta = val
       this.forceRerender()
@@ -40,6 +46,16 @@ export default {
       this.undian.push(val)
     },
     updatePemenang(val) {
+      let updatePeserta = []
+      const dataPeserta = JSON.parse(this.peserta)
+      for(let i = 0; i < dataPeserta.length; i++){
+        if(dataPeserta[i].name !== val.name){
+          updatePeserta.push(dataPeserta[i])
+        }
+      }
+      this.peserta = JSON.stringify(updatePeserta)
+      this.pemenang.push(val)
+      console.log(this.pemenang)
       console.log(this.peserta)
     },
     async forceRerender(){
@@ -47,12 +63,10 @@ export default {
       await this.$nextTick()
       this.renderComponent = true
     },
-    findId(arr, attr, val) {
-      for(var i; i < arr.length; i++) {
-        if(arr[i][attr] === val){
-          return i;
-        }
-      }
+    undianSelanjutnya(val) {
+      this.template = ''
+      this.num = val
+      setTimeout(this.template = 'undian', 1000)
     }
   }
 }
@@ -65,7 +79,7 @@ export default {
   <div class="container">
     <Transition>
       <div v-if="template === ''" style="padding-top: 100px; padding-bottom: 100px;">
-        <a href="#" @click="template = 'undian'" class="btn btn-primary btn-lg">Mulai Undian</a>
+        <a href="#" @click="pindahHalaman('undian')" class="btn btn-primary btn-lg">Mulai Undian</a>
       </div>
     </Transition>
     <Transition>
@@ -75,19 +89,19 @@ export default {
     </Transition>
     <Transition>
       <div v-if="template === 'kelola'" key="2" style="padding-top: 100px; padding-bottom: 100px;">
-        <Kelola :undian="undian" @update="updateUndian" v-if="renderComponent"></Kelola>
+        <Kelola :undian="undian" :peserta="peserta" :pemenang="pemenang" @update="updateUndian" v-if="renderComponent"></Kelola>
       </div>
     </Transition>
     <Transition>
       <div v-if="template === 'undian'" key="3" style="padding-top: 100px; padding-bottom: 100px;">
-        <Undian :undian="undian" :peserta="peserta" @update="updatePemenang" v-if="renderComponent"></Undian>
+        <Undian :undian="undian" :num="num" :peserta="peserta" :pemenang="pemenang" @update="updatePemenang" @next="undianSelanjutnya" v-if="renderComponent"></Undian>
       </div>
     </Transition>
   </div>
   <div class="menu row justify-content-center">
-    <div class="col-1"><a href="#" @click="template = ''" class="btn btn-secondary"><i class="fa fa-home"></i></a></div>
-    <div class="col-1"><a href="#" @click="template = 'kelola'" class="btn btn-secondary"><i class="fa fa-cog"></i></a></div>
-    <div class="col-1"><a href="#" @click="template = 'peserta'" class="btn btn-secondary"><i class="fa fa-user-friends"></i></a></div>
+    <div class="col-1"><a href="#" @click="pindahHalaman('')" class="btn btn-secondary"><i class="fa fa-home"></i></a></div>
+    <div class="col-1"><a href="#" @click="pindahHalaman('kelola')" class="btn btn-secondary"><i class="fa fa-cog"></i></a></div>
+    <div class="col-1"><a href="#" @click="pindahHalaman('peserta')" class="btn btn-secondary"><i class="fa fa-user-friends"></i></a></div>
   </div>
 </template>
 
@@ -118,6 +132,7 @@ export default {
 }
 .container {
   margin-top: 17vh;
+  min-width: 85vw;
 }
 .invisible {
   visibility: hidden;

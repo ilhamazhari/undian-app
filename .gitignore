@@ -10,6 +10,8 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
+undian-app-win32-x64
+undian-app-win32-x64.zip
 *.local
 
 # Editor directories and files

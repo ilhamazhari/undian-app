@@ -1,6 +1,8 @@
 <script>
 export default {
-  props: ['undian'],
+  components: {
+  },
+  props: ['undian', 'peserta', 'pemenang'],
   data(){
     return {
       title: '',
@@ -9,9 +11,6 @@ export default {
     }
   },
   methods: {
-    randomList() {
-      return this.peserta.slice(0,5).sort(function(){ return 0.5 - Math.random() })
-    },
     handleImg(img){
       const selectedImg = img.target.files[0]
       this.createImg(selectedImg)
@@ -27,7 +26,28 @@ export default {
     },
     save(){
       this.$emit('update', {title: this.title, num: this.num, image: this.image})
+      document.getElementById('namaUndian').empty()
+      document.getElementById('jumlahPemenang').empty()
+      document.getElementById('gambarUndian').empty()
+      doc
+
+    },
+    simpanPemenang() {
+      const fileData = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(this.pemenang))
+      const btnDownload = document.getElementById('downloadPemenang')
+      btnDownload.setAttribute('href', fileData)
+      btnDownload.setAttribute('download', 'pemenang.json')
+    },
+    simpanPeserta() {
+      const fileData = 'data:text/json;charset=utf-8,' + encodeURIComponent(this.peserta)
+      const btnDownload = document.getElementById('downloadPeserta')
+      btnDownload.setAttribute('href', fileData)
+      btnDownload.setAttribute('download', 'peserta.json')
     }
+  },
+  mounted() {
+    this.simpanPeserta()
+    this.simpanPemenang()
   }
 }
 </script>
@@ -35,7 +55,7 @@ export default {
 <template>
   <h1>Kelola Undian</h1>
   <div class="row">
-    <div class="col-4">
+    <div class="col-3">
       <form action="" @submit.prevent>
         <div class="card">
           <img :src="image" v-show="image" class="card-img-top">
@@ -60,7 +80,7 @@ export default {
         </div>
       </form>
     </div>
-    <div class="col-8">
+    <div class="col-6">
       <div class="card-columns">
         <div class="card" v-for="und in undian">
           <img :src="und.image" class="card-img-top">
@@ -68,6 +88,18 @@ export default {
             <h5 class="card-title">{{ und.title }}</h5>
             <p>{{ und.num }} Pemenang</p>
           </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-3">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="card-title">Unduh peserta undian</h5>
+        </div>
+        <div class="card-body">
+          <a href="" class="btn btn-secondary" id="downloadPeserta"><i class="fa fa-download"></i> Unduh Peserta</a>
+          <hr>
+          <a href="" class="btn btn-secondary" id="downloadPemenang"><i class="fa fa-download"></i> Unduh Pemenang</a>
         </div>
       </div>
     </div>
